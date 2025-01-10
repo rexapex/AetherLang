@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module GameSpec where
+module AetherSpec where
 
 import Test.Hspec
 --import Test.QuickCheck

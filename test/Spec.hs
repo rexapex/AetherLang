@@ -1,5 +1,5 @@
-import GameSpec
+import AetherSpec
 
 main :: IO ()
-main = GameSpec.spec
+main = AetherSpec.spec
 
