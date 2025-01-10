@@ -5,51 +5,53 @@ module Lexer where
 import qualified Data.Text as T
 import qualified Data.Char as C
 
+data TokenSource = TokenSource T.Text Int Int deriving (Eq, Show)
+
 data Token = None
            | EndLine
-           | LineComment T.Text
-           | Identifier T.Text
-           | NumberLiteral T.Text
-           | StringLiteral T.Text
-           | IntType
-           | FloatType
-           | StringType
-           | BoolType
-           | FnKeyword
-           | StructKeyword
-           | LetKeyword
-           | ReturnKeyword
-           | TrueKeyword
-           | FalseKeyword
-           | BlockStart
-           | BlockEnd
-           | ParenthesisOpen
-           | ParenthesisClose
-           | ListStart
-           | ListEnd
-           | AssignOperator
-           | DotOperator
-           | CommaSeparator
-           | BooleanOr
-           | BooleanAnd
-           | BooleanNot
-           | AddOperator
-           | SubtractOperator
-           | MultiplyOperator
-           | DivideOperator
-           | EqualsComparator
-           | NotEqualsComparator
-           | LessThanComparator
-           | GreaterThanComparator
-           | LEqualsComparator
-           | GEqualsComparator
-           | ReturnsOperator deriving (Eq, Show)
+           | LineComment TokenSource
+           | Identifier TokenSource
+           | NumberLiteral TokenSource
+           | StringLiteral TokenSource
+           | IntType TokenSource
+           | FloatType TokenSource
+           | StringType TokenSource
+           | BoolType TokenSource
+           | FnKeyword TokenSource
+           | StructKeyword TokenSource
+           | LetKeyword TokenSource
+           | ReturnKeyword TokenSource
+           | TrueKeyword TokenSource
+           | FalseKeyword TokenSource
+           | BlockStart TokenSource
+           | BlockEnd TokenSource
+           | ParenthesisOpen TokenSource
+           | ParenthesisClose TokenSource
+           | ListStart TokenSource
+           | ListEnd TokenSource
+           | AssignOperator TokenSource
+           | DotOperator TokenSource
+           | CommaSeparator TokenSource
+           | BooleanOr TokenSource
+           | BooleanAnd TokenSource
+           | BooleanNot TokenSource
+           | AddOperator TokenSource
+           | SubtractOperator TokenSource
+           | MultiplyOperator TokenSource
+           | DivideOperator TokenSource
+           | EqualsComparator TokenSource
+           | NotEqualsComparator TokenSource
+           | LessThanComparator TokenSource
+           | GreaterThanComparator TokenSource
+           | LEqualsComparator TokenSource
+           | GEqualsComparator TokenSource
+           | ReturnsOperator TokenSource deriving (Eq, Show)
 
-getTokenFromSrc :: T.Text -> Token
-getTokenFromSrc "" = None
-getTokenFromSrc "\n" = EndLine
-getTokenFromSrc "\r" = EndLine
-getTokenFromSrc txt | isNumberLiteral txt = NumberLiteral txt
+getTokenFromSrc :: T.Text -> Int -> Int -> Token
+getTokenFromSrc "" _ _        = None
+getTokenFromSrc "\n" _ _ = EndLine
+getTokenFromSrc "\r" _ _ = EndLine
+getTokenFromSrc txt line col  | isNumberLiteral txt = NumberLiteral $ TokenSource txt line col
     where
         isNumberLiteral :: T.Text -> Bool
         isNumberLiteral txt2 = case T.uncons txt2  of
@@ -68,75 +70,81 @@ getTokenFromSrc txt | isNumberLiteral txt = NumberLiteral txt
             Just _                    -> False
             _                         -> True
 -- StringLiteral is handled separately so not needed here
-getTokenFromSrc "int" = IntType
-getTokenFromSrc "float" = FloatType
-getTokenFromSrc "string" = StringType
-getTokenFromSrc "bool" = BoolType
-getTokenFromSrc "fn" = FnKeyword
-getTokenFromSrc "struct" = StructKeyword
-getTokenFromSrc "let" = LetKeyword
-getTokenFromSrc "return" = ReturnKeyword
-getTokenFromSrc "true" = TrueKeyword
-getTokenFromSrc "false" = FalseKeyword
-getTokenFromSrc "{" = BlockStart
-getTokenFromSrc "}" = BlockEnd
-getTokenFromSrc "(" = ParenthesisOpen
-getTokenFromSrc ")" = ParenthesisClose
-getTokenFromSrc "[" = ListStart
-getTokenFromSrc "]" = ListEnd
-getTokenFromSrc "=" = AssignOperator
-getTokenFromSrc "." = DotOperator
-getTokenFromSrc "," = CommaSeparator
-getTokenFromSrc "||" = BooleanOr
-getTokenFromSrc "&&" = BooleanAnd
-getTokenFromSrc "!" = BooleanNot
-getTokenFromSrc "+" = AddOperator
-getTokenFromSrc "-" = SubtractOperator
-getTokenFromSrc "*" = MultiplyOperator
-getTokenFromSrc "/" = DivideOperator
-getTokenFromSrc "==" = EqualsComparator
-getTokenFromSrc "!=" = NotEqualsComparator
-getTokenFromSrc "<" = LessThanComparator
-getTokenFromSrc ">" = GreaterThanComparator
-getTokenFromSrc "<=" = LEqualsComparator
-getTokenFromSrc ">=" = GEqualsComparator
-getTokenFromSrc "->" = ReturnsOperator
-getTokenFromSrc txt = Identifier txt
+getTokenFromSrc txt@"int"    line col = IntType                 $ TokenSource txt line col
+getTokenFromSrc txt@"float"  line col = FloatType               $ TokenSource txt line col
+getTokenFromSrc txt@"string" line col = StringType              $ TokenSource txt line col
+getTokenFromSrc txt@"bool"   line col = BoolType                $ TokenSource txt line col
+getTokenFromSrc txt@"fn"     line col = FnKeyword               $ TokenSource txt line col
+getTokenFromSrc txt@"struct" line col = StructKeyword           $ TokenSource txt line col
+getTokenFromSrc txt@"let"    line col = LetKeyword              $ TokenSource txt line col
+getTokenFromSrc txt@"return" line col = ReturnKeyword           $ TokenSource txt line col
+getTokenFromSrc txt@"true"   line col = TrueKeyword             $ TokenSource txt line col
+getTokenFromSrc txt@"false"  line col = FalseKeyword            $ TokenSource txt line col
+getTokenFromSrc txt@"{"      line col = BlockStart              $ TokenSource txt line col
+getTokenFromSrc txt@"}"      line col = BlockEnd                $ TokenSource txt line col
+getTokenFromSrc txt@"("      line col = ParenthesisOpen         $ TokenSource txt line col
+getTokenFromSrc txt@")"      line col = ParenthesisClose        $ TokenSource txt line col
+getTokenFromSrc txt@"["      line col = ListStart               $ TokenSource txt line col
+getTokenFromSrc txt@"]"      line col = ListEnd                 $ TokenSource txt line col
+getTokenFromSrc txt@"="      line col = AssignOperator          $ TokenSource txt line col
+getTokenFromSrc txt@"."      line col = DotOperator             $ TokenSource txt line col
+getTokenFromSrc txt@","      line col = CommaSeparator          $ TokenSource txt line col
+getTokenFromSrc txt@"||"     line col = BooleanOr               $ TokenSource txt line col
+getTokenFromSrc txt@"&&"     line col = BooleanAnd              $ TokenSource txt line col
+getTokenFromSrc txt@"!"      line col = BooleanNot              $ TokenSource txt line col
+getTokenFromSrc txt@"+"      line col = AddOperator             $ TokenSource txt line col
+getTokenFromSrc txt@"-"      line col = SubtractOperator        $ TokenSource txt line col
+getTokenFromSrc txt@"*"      line col = MultiplyOperator        $ TokenSource txt line col
+getTokenFromSrc txt@"/"      line col = DivideOperator          $ TokenSource txt line col
+getTokenFromSrc txt@"=="     line col = EqualsComparator        $ TokenSource txt line col
+getTokenFromSrc txt@"!="     line col = NotEqualsComparator     $ TokenSource txt line col
+getTokenFromSrc txt@"<"      line col = LessThanComparator      $ TokenSource txt line col
+getTokenFromSrc txt@">"      line col = GreaterThanComparator   $ TokenSource txt line col
+getTokenFromSrc txt@"<="     line col = LEqualsComparator       $ TokenSource txt line col
+getTokenFromSrc txt@">="     line col = GEqualsComparator       $ TokenSource txt line col
+getTokenFromSrc txt@"->"     line col = ReturnsOperator         $ TokenSource txt line col
+getTokenFromSrc txt          line col = Identifier              $ TokenSource txt line col
 
 lexSource :: T.Text -> [Token]
-lexSource src = filter (/= None) $ processChar src "" []
+lexSource src = filter (/= None) $ continue src "" 0 0 0 []
     where
-        processChar :: T.Text -> T.Text -> [Token] -> [Token]
-        processChar txt tok tokens = case T.uncons txt of
-            Just ('\"', cs)
-                -> formString cs "" (tokens ++ [getTokenFromSrc tok])
-            Just (' ', cs)
-                -> processChar cs "" (tokens ++ [getTokenFromSrc tok])
-            Just ('/', cs) | lookahead1 cs == "/"
-                -> formLineComment (T.tail cs) "" (tokens ++ [getTokenFromSrc tok])
-            Just (c, cs) | isDelimT (tok <> T.singleton c)
-                -> processChar cs "" (tokens ++ [getTokenFromSrc $ tok <> T.singleton c])
-            Just (c, cs) | isDelimC c
-                -> if isDelimT $ T.singleton c <> lookahead1 cs then -- Some length 2 delims contain length 1 delims, so need to lookahead before assuming length 1
-                       processChar cs (T.singleton c) (tokens ++ [getTokenFromSrc tok])
-                   else
-                       processChar cs "" (tokens ++ [getTokenFromSrc tok, getTokenFromSrc $ T.singleton c])
-            Just (c, cs)
-                -> processChar cs (tok <> T.singleton c) tokens
-            Nothing
-                -> tokens ++ [getTokenFromSrc tok]
+        continue :: T.Text -> T.Text -> Int -> Int -> Int -> [Token] -> [Token]
+        continue txt tok line col tokCol tokens =
+            let
+                appendToksAndContinue remainingTxt nextTokenSrc newTokens = continue remainingTxt nextTokenSrc line (col + 1) (col + 1) (tokens ++ newTokens)
+                tokAsToken = getTokenFromSrc tok line tokCol
+            in case T.uncons txt of
+                Just ('\"', cs)
+                    -> continueAsString cs "" line (col + 1) col (tokens ++ [tokAsToken])
+                Just (' ', cs)
+                    -> appendToksAndContinue cs "" [tokAsToken]
+                Just ('/', cs) | lookahead1 cs == "/"
+                    -> continueAsLineComment (T.tail cs) "" line col (tokens ++ [tokAsToken])
+                Just (c, cs) | isDelimT (tok <> T.singleton c)
+                    -> appendToksAndContinue cs "" [getTokenFromSrc (tok <> T.singleton c) line tokCol]
+                Just (c, cs) | isDelimC c ->
+                    if c == '\n' || c == '\r' then
+                        continue cs "" (line + 1) 0 0 (tokens ++ [tokAsToken, EndLine])
+                    else if isDelimT $ T.singleton c <> lookahead1 cs then -- Some length 2 delims contain length 1 delims, so need to lookahead before assuming length 1
+                        continue cs (T.singleton c) line (col + 1) col (tokens ++ [tokAsToken])
+                    else
+                        appendToksAndContinue cs "" [tokAsToken, getTokenFromSrc (T.singleton c) line col]
+                Just (c, cs)
+                    -> continue cs (tok <> T.singleton c) line (col + 1) tokCol tokens
+                Nothing
+                    -> tokens ++ [tokAsToken]
 
-        formString :: T.Text -> T.Text -> [Token] -> [Token]
-        formString txt tok tokens = case T.uncons txt of
-            Just ('\"', cs) -> processChar cs "" (tokens ++ [StringLiteral tok])
-            Just (c, cs)    -> formString cs (tok <> T.singleton c) tokens
-            Nothing         -> tokens ++ [StringLiteral tok]
+        continueAsString :: T.Text -> T.Text -> Int -> Int -> Int -> [Token] -> [Token]
+        continueAsString txt tok line col tokCol tokens = case T.uncons txt of
+            Just ('\"', cs) -> continue cs "" line (col + 1) (col + 1) (tokens ++ [StringLiteral $ TokenSource tok line tokCol])
+            Just (c, cs)    -> continueAsString cs (tok <> T.singleton c) line (col + 1) tokCol tokens
+            Nothing         -> tokens ++ [StringLiteral $ TokenSource tok line tokCol]
 
-        formLineComment :: T.Text -> T.Text -> [Token] -> [Token]
-        formLineComment txt tok tokens = case T.uncons txt of
-            Just (c, cs) | c == '\n' || c == '\r' -> processChar cs "" (tokens ++ [LineComment tok])
-            Just (c, cs)                          -> formLineComment cs (tok <> T.singleton c) tokens
-            Nothing                               -> tokens ++ [LineComment tok]
+        continueAsLineComment :: T.Text -> T.Text -> Int -> Int -> [Token] -> [Token]
+        continueAsLineComment txt tok line tokCol tokens = case T.uncons txt of
+            Just (c, cs) | c == '\n' || c == '\r' -> continue cs "" (line + 1) 0 0 (tokens ++ [LineComment $ TokenSource tok line tokCol])
+            Just (c, cs)                          -> continueAsLineComment cs (tok <> T.singleton c) line tokCol tokens
+            Nothing                               -> tokens ++ [LineComment $ TokenSource tok line tokCol]
 
         lookahead1 :: T.Text -> T.Text
         lookahead1 txt = case T.uncons txt of
