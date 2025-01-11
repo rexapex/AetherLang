@@ -32,6 +32,13 @@ packages:
       size: 1528
   original:
     hackage: random-1.2.1.1
+- completed:
+    hackage: formatting-7.2.0@sha256:7ace29c0d228ef6d69b811df3274de4ebbc5e5de1628cecbd87e3b1a387ff7be,3655
+    pantry-tree:
+      sha256: 5ae522db3d90597ba455b0746dcece62ece0e9b3a6b2529512f342a702e1ab54
+      size: 1314
+  original:
+    hackage: formatting-7.2.0
 snapshots:
 - completed:
     sha256: 5a59b2a405b3aba3c00188453be172b85893cab8ebc352b1ef58b0eae5d248a2
